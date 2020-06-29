@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SAGA_METADATA>
+  <HISTORY saga-version="2.2.3">
+    <MODULE library="db_pgsql" id="12" name="Import Table">
+      <OPTION type="choice" id="TABLES" name="Tables" index="193">res_bank_pt_san_jose_blocks_within_san_jose_pt</OPTION>
+      <OUTPUT type="table" id="TABLE" name="Table">res_bank_pt_san_jose_blocks_within_san_jose_pt</OUTPUT>
+    </MODULE>
+  </HISTORY>
+  <SOURCE>
+    <FILE>/home/arminakvn/Google Drive/routing_run/results/analysis_of_results/_all_data/res_bank_pt_san_jose_blocks_within_san_jose_pt.csv</FILE>
+    <DATABASE>
+      <DBMS>PostgreSQL</DBMS>
+      <HOST>40.123.32.90</HOST>
+      <PORT>5432</PORT>
+      <USER>postgres</USER>
+      <NAME>postgres</NAME>
+      <TABLE>res_bank_pt_san_jose_blocks_within_san_jose_pt</TABLE>
+    </DATABASE>
+    <PROJECTION></PROJECTION>
+  </SOURCE>
+  <DESCRIPTION></DESCRIPTION>
+</SAGA_METADATA>
