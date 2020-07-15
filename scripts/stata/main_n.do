@@ -1,4 +1,4 @@
-log using main_l.log, replace
+log using mainn.log, replace
 use "expv13.dta", clear
 xtset citnum
 
@@ -13,35 +13,34 @@ foreach mode in cr pt ft {
 bysort aclsr_`mode': sum blc15 lat15 asi15 oth15 pov15 frn15 ppdnl15 edu15 ump15 own15  hu15sqk vacrat15 blb00 cmdnpcpt
 }
 
-* PREDICTIONS FOR pr AFI is closer
+* MODELS PREDICTING LOG ODDS THAT NEAREST AFI IS CLOSER THAN NEAREST BANK
 * CAR and FOOT
 foreach mode in cr ft {
-xtlogit aclsr_`mode' blc15 lat15 asi15 oth15, re vce(robust) 
+xtlogit aclsr_`mode' blc15 lat15 asi15 oth15, re vce(robust)
+eststo `mode'_1
 xtlogit aclsr_`mode' blc15 lat15 asi15 oth15 pov15, re vce(robust) 
+eststo `mode'_2
 xtlogit aclsr_`mode' blc15 lat15 asi15 oth15 pov15 frn15 ppdnl15, re vce(robust) 
+eststo `mode'_3
 xtlogit aclsr_`mode' blc15 lat15 asi15 oth15 pov15 frn15 ppdnl15 edu15 ump15 own15  hu15sqk vacrat15 blb00, re vce(robust) 
+eststo `mode'_4
 xtlogit aclsr_`mode' blc15 lat15 asi15 oth15 pov15 frn15 ppdnl15 edu15 ump15 own15  hu15sqk vacrat15 blb00 cmdnpcpt, re vce(robust)
-}
-* PUBLIC TRANSIT after excluding Memphis, due to data issues
+eststo `mode'_5
+ }
+* PUBLIC TRANSIT, after excluding Memphis due to data issues
 xtlogit aclsr_pt blc15 lat15 asi15 oth15 if cityname~="memphis", re vce(robust) 
+eststo pt_1
 xtlogit aclsr_pt blc15 lat15 asi15 oth15 pov15 if cityname~="memphis", re vce(robust) 
+eststo pt_2
 xtlogit aclsr_pt blc15 lat15 asi15 oth15 pov15 frn15 ppdnl15 if cityname~="memphis", re vce(robust) 
+eststo pt_3
 xtlogit aclsr_pt blc15 lat15 asi15 oth15 pov15 frn15 ppdnl15 edu15 ump15 own15  hu15sqk vacrat15 blb00 if cityname~="memphis", re vce(robust) 
-xtlogit aclsr_pt blc15 lat15 asi15 oth15 pov15 frn15 ppdnl15 edu15 ump15 own15  hu15sqk vacrat15 blb00 cmdnpcpt if cityname~="memphis", re vce(robust) 
-
-* PREDICTIONS FOR PROXIMITY TO BANK, TO AFI
-* CAR and FOOT
-foreach type in b a {
-display "* FOR INSTITUTION:`type'"
-foreach mode in cr ft {
-xtreg t`type'_`mode'mn blc15 lat15 asi15 oth15, mle 
-xtreg t`type'_`mode'mn blc15 lat15 asi15 oth15 pov15 frn15 ppdnl15 edu15 ump15 own15  hu15sqk vacrat15 blb00 cmdnpcpt, mle 
- }
- }
-* PUBLIC TRANSIT after excluding Memphis, due to data issues
-foreach type in b a {
-xtreg t`type'_ptmn blc15 lat15 asi15 oth15 if cityname~="memphis", mle 
-xtreg t`type'_ptmn blc15 lat15 asi15 oth15 pov15 frn15 ppdnl15 edu15 ump15 own15  hu15sqk vacrat15 blb00 cmdnpcpt if cityname~="memphis", mle
+eststo pt_4
+xtlogit aclsr_pt blc15 lat15 asi15 oth15 pov15 frn15 ppdnl15 edu15 ump15 own15  hu15sqk vacrat15 blb00 cmdnpcpt if cityname~="memphis", re vce(robust)
+eststo pt_5
+* GENERATE METHODOLOGICAL_NOTE TABLE N1
+foreach mode in cr ft pt {
+esttab `mode'_1	`mode'_2 `mode'_3 `mode'_4 `mode'_5 using table_`mode'.rtf, replace nogap onecell se	
 }
 
 
@@ -75,7 +74,7 @@ margins, atmeans at(pov15=50 blc15=10 wht15=40 lat15=40 asi15=8 oth15=2) at(pov1
 margins, atmeans at(pov15=50 lat15=10 wht15=40 blc15=40 asi15=8 oth15=2) at(pov15=50 lat15=30 wht15=30 blc15=30 asi15=8 oth15=2) at(pov15=50 lat15=50 wht15=20 blc15=20 asi15=8 oth15=2)  at(pov15=50 lat15=70 wht15=10 blc15=10 asi15=8 oth15=2) at(pov15=50 lat15=90 wht15=0 blc15=0 asi15=8 oth15=2)
  }
 
-* PUBLIC TRANSIT after excluding Memphis, due to data issues
+ * PUBLIC TRANSIT after excluding Memphis, due to data issues
 ****** UNADJUSTED *****
 xtlogit aclsr_pt wht15 blc15 lat15 asi15 oth15 if cityname~="memphis", re vce(robust) nocons
 * For wht = 10, 30, 50, 70, 90
@@ -102,8 +101,7 @@ margins, atmeans at(pov15=50 blc15=10 wht15=40 lat15=40 asi15=8 oth15=2) at(pov1
 * For lat = 10, 30, 50, 70, 90
 margins, atmeans at(pov15=50 lat15=10 wht15=40 blc15=40 asi15=8 oth15=2) at(pov15=50 lat15=30 wht15=30 blc15=30 asi15=8 oth15=2) at(pov15=50 lat15=50 wht15=20 blc15=20 asi15=8 oth15=2)  at(pov15=50 lat15=70 wht15=10 blc15=10 asi15=8 oth15=2) at(pov15=50 lat15=90 wht15=0 blc15=0 asi15=8 oth15=2)
 
-
-*** TO CREATE FIGURE 2
+*** TO CREATE FIGURE 2, WE ADD PROPORTION WHITE AND SUPRESS CONSTANT
 * CAR and FOOT
 foreach mode in cr ft {
 xtlogit aclsr_`mode' wht15 blc15 lat15 asi15 oth15 pov15 frn15 ppdnl15 edu15 ump15 own15  hu15sqk vacrat15 blb00 cmdnpcpt, re vce(robust) nocons
@@ -122,4 +120,31 @@ margins, atmeans at(pov15=50 wht15=70 blc15=10 lat15=10 asi15=8 oth15=2 (p75)ump
 ** FOR NONPOOR, EMPLOYED, COLLEGE ED, HOME-OWNERS N'HOOD
 * For poor=10% and wht=70%, blc=70%, or lat=70%
 margins, atmeans at(pov15=10 wht15=70 blc15=10 lat15=10 asi15=8 oth15=2 (p25)ump15 (p75)edu15 (p75)own15) at(pov15=10 blc15=70 wht15=10 lat15=10 asi15=8 oth15=2 (p25)ump15 (p75)edu15 (p75)own15) at(pov15=10 lat15=70 wht15=10 blc15=10 asi15=8 oth15=2 (p25)ump15 (p75)edu15 (p75)own15) 
+ 
+ 
+*** SUPPLEMENTARY ANALYSES.  PREDICTING PROXIMITY TO BANK AND PROXIMITY TO AFI
+* CAR AND FOOT
+foreach type in b a {
+display "* FOR INSTITUTION:`type'"
+foreach mode in cr ft {
+xtreg t`type'_`mode'mn blc15 lat15 asi15 oth15, mle 
+eststo `type'_`mode'_1
+xtreg t`type'_`mode'mn blc15 lat15 asi15 oth15 pov15 frn15 ppdnl15 edu15 ump15 own15  hu15sqk vacrat15 blb00 cmdnpcpt, mle 
+eststo `type'_`mode'_2
+ }
+ }
+* PUBLIC TRANSIT after excluding Memphis, due to data issues
+foreach type in b a {
+xtreg t`type'_ptmn blc15 lat15 asi15 oth15 if cityname~="memphis", mle 
+eststo `type'_pt_1
+xtreg t`type'_ptmn blc15 lat15 asi15 oth15 pov15 frn15 ppdnl15 edu15 ump15 own15  hu15sqk vacrat15 blb00 cmdnpcpt if cityname~="memphis", mle
+eststo `type'_pt_2
+}
+* GENERATE METHODOLOGICAL_NOTE, TABLE N2
+foreach type in b a {
+ foreach mode in cr ft pt {
+esttab `type'_`mode'_1 `type'_`mode'_2 using table_`type'_`mode'.rtf, replace nogap onecell se
+}
+}
+
 log close
